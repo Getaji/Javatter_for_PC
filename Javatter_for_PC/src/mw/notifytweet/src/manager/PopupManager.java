@@ -1,24 +1,18 @@
 package mw.notifytweet.src.manager;
 
-import java.awt.Color;
-import java.awt.GraphicsEnvironment;
-import java.io.IOException;
-import java.net.URL;
-
-import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.Timer;
-
+import com.orekyuu.javatter.util.IconCache;
 import mw.notifytweet.src.EnumData;
-import mw.notifytweet.src.NTTimer;
 import mw.notifytweet.src.NotifyTweet;
 import mw.notifytweet.src.NotifyTweetException;
 import mw.notifytweet.src.component.JPopup;
 import twitter4j.Status;
 import twitter4j.User;
 
-import com.orekyuu.javatter.util.IconCache;
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
+import java.io.IOException;
+import java.net.URL;
 
 /**
  * ポップアップを管理するクラス.
@@ -89,13 +83,6 @@ public enum PopupManager {
             } catch (IOException e) {
                 throw new NotifyTweetException("アイコン画像を取得できません");
             }
-
-            NTTimer nttimer = new NTTimer(index);
-            Timer timer = new Timer(
-                    NotifyTweet.getInstance()
-                    .getConfigManager().getTimePopup(), nttimer);
-            nttimer.setTimer(timer);
-            timer.start();
         }
         try {
             popups[index].setVisible(visible);
@@ -135,13 +122,6 @@ public enum PopupManager {
             } catch (IOException e) {
                 throw new NotifyTweetException("アイコン画像を取得できません");
             }
-
-            NTTimer nttimer = new NTTimer(index);
-            Timer timer = new Timer(
-                    NotifyTweet.getInstance()
-                    .getConfigManager().getTimePopup(), nttimer);
-            nttimer.setTimer(timer);
-            timer.start();
         }
         try {
             popups[index].setVisible(visible);
@@ -170,14 +150,6 @@ public enum PopupManager {
             popups[index].setTextUser("@" + name + " / " + names + " :");
             popups[index].setTextText(text);
             popups[index].setPanelBackground(background);
-
-            NTTimer nttimer = new NTTimer(index);
-            Timer timer = new Timer(
-                    NotifyTweet.getInstance()
-                    .getConfigManager().getTimePopup(), nttimer);
-            nttimer.setTimer(timer);
-            timer.setRepeats(false);
-            timer.restart();
         }
         try {
             popups[index].setVisible(visible);

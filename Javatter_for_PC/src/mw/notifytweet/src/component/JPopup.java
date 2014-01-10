@@ -4,19 +4,17 @@
  */
 package mw.notifytweet.src.component;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Window;
-
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.border.LineBorder;
-
 import mw.notifytweet.src.EnumData;
 import mw.notifytweet.src.NTMouseListener;
-import mw.notifytweet.src.NTTimer;
 import mw.notifytweet.src.NotifyTweet;
+
+import javax.swing.*;
+import javax.swing.border.LineBorder;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 /**
  * 新着ツイートポップアップの最上コンポーネント.<br />
@@ -24,13 +22,16 @@ import mw.notifytweet.src.NotifyTweet;
  * 表示位置の元になるポップアップ番号とピンの状態を保持します.
  *
  */
-public class JPopup extends Window {
+public class JPopup extends Window implements ActionListener, MouseListener {
 
     /** ポップアップ番号. */
     private int index;
 
     /** ピンの状態. */
     private boolean pin = false;
+
+    /** ピンが刺さっているか. */
+    private boolean isOverMouse = false;
 
 
     /** パネル. */
@@ -54,8 +55,8 @@ public class JPopup extends Window {
     /** テキストラベル. */
     private JLabel labelTextText;
 
-    private NTTimer timer;
-
+    /** タイマー. */
+    private Timer timer;
     /**
      * コンストラクタ.
      * @param par0index int:ポップアップ番号
@@ -122,7 +123,10 @@ public class JPopup extends Window {
 
         add(panel);
 
-        timer = new NTTimer(index);
+        timer = new Timer(NotifyTweet.getInstance()
+                .getConfigManager().getTimePopup(), this);
+
+        addMouseListener(this);
     }
 
     @Override
@@ -149,11 +153,15 @@ public class JPopup extends Window {
 
     /**
      * ピンの状態を変更します.
-     * ピンを指す場合はtrue,抜く場合はfalseを渡します.
-     * @param ispin boolean:ピンを有効にする
+     * ピンを刺す場合はtrue,抜く場合はfalseを渡します.
+     * @param isPin boolean:ピンを有効にする
      */
     public void setPin(boolean isPin) {
-        pin = isPin;
+        this.pin = isPin;
+        if (isPin)
+            timer.stop();
+        else
+            timer.start();
     }
 
     /**
@@ -245,6 +253,38 @@ public class JPopup extends Window {
     				labelIconPin.getY() - 1);
     		isPinDown = false;
     	}
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        setVisible(false);
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        // skip
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+        // skip
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        // skip
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+        this.isOverMouse = true;
+        timer.stop();
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+        this.isOverMouse = false;
+        timer.start();
     }
 }
 
