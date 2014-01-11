@@ -1,19 +1,13 @@
 package mw.tintin.src;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JButton;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-
 import com.orekyuu.javatter.plugin.JavatterPlugin;
 import com.orekyuu.javatter.view.IJavatterTab;
+
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * 何も言うことはない.
@@ -47,12 +41,57 @@ public class TinTin extends JavatterPlugin implements IJavatterTab {
 	public Component getComponent() {
 		final JPanel panel = new JPanel();
 		panel.setLayout(new BorderLayout());
-		
-		final JTextField field = new JTextField(penis + "@@" + temp + "@@" + tempnot + "@@" + max);
-		panel.add(field, BorderLayout.NORTH);
+
+        final JPanel panelForm = new JPanel();
+        final GroupLayout groupLayout = new GroupLayout(panelForm);
+        final JLabel labelWord = new JLabel("Word");
+        final JLabel labelOrgasm = new JLabel("Orgasm");
+        final JLabel labelNotOrgasm = new JLabel("Not orgasm");
+        final JLabel labelTryCount = new JLabel("Try");
+        final JTextField fieldWord = new JTextField(penis);
+        final JTextField fieldOrgasm = new JTextField(temp);
+        final JTextField fieldNotOrgasm = new JTextField(tempnot);
+        final JSpinner spinnerTryCount = new JSpinner();
+        panelForm.setLayout(groupLayout);
+        spinnerTryCount.setValue(max);
+        panelForm.setBorder(new EmptyBorder(4, 4, 4, 4));
+        groupLayout.setHorizontalGroup(
+                groupLayout.createSequentialGroup()
+                        .addGroup(groupLayout.createParallelGroup()
+                                .addComponent(labelWord)
+                                .addComponent(labelOrgasm)
+                                .addComponent(labelNotOrgasm)
+                                .addComponent(labelTryCount))
+                        .addGroup(groupLayout.createParallelGroup()
+                                .addComponent(fieldWord)
+                                .addComponent(fieldOrgasm)
+                                .addComponent(fieldNotOrgasm)
+                                .addComponent(spinnerTryCount))
+        );
+        groupLayout.setVerticalGroup(
+                groupLayout.createSequentialGroup()
+                        .addGroup(groupLayout.createParallelGroup(
+                                GroupLayout.Alignment.BASELINE)
+                                .addComponent(labelWord)
+                                .addComponent(fieldWord))
+                        .addGroup(groupLayout.createParallelGroup(
+                                GroupLayout.Alignment.BASELINE)
+                                .addComponent(labelOrgasm)
+                                .addComponent(fieldOrgasm))
+                        .addGroup(groupLayout.createParallelGroup(
+                                GroupLayout.Alignment.BASELINE)
+                                .addComponent(labelNotOrgasm)
+                                .addComponent(fieldNotOrgasm))
+                        .addGroup(groupLayout.createParallelGroup(
+                                GroupLayout.Alignment.BASELINE)
+                                .addComponent(labelTryCount)
+                                .addComponent(spinnerTryCount))
+        );
+		panel.add(panelForm, BorderLayout.NORTH);
 		
 		final JTextArea area = new JTextArea();
 		final JScrollPane scroll = new JScrollPane();
+        final JScrollBar scrollBar = scroll.getVerticalScrollBar();
 		scroll.setViewportView(area);
 		area.setLineWrap(true);
 		area.setEditable(false);
@@ -61,19 +100,16 @@ public class TinTin extends JavatterPlugin implements IJavatterTab {
 		
 		final JPanel panelButton = new JPanel();
 		final JButton buttonGo = new JButton("Go");
-		final JButton buttonSet = new JButton("ツイート欄にセット");
+		final JButton buttonSet = new JButton("Set tweet area");
 		buttonGo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (field.getText().split("@@").length < 4) {
-					area.setText("フォーマットちゃうで");
-					return;
-				}
 				final Thread thread = new Thread() {
 					public void run() {
 						buttonGo.setEnabled(false);
-						String[] sp = field.getText().split("@@", 4);
-						penis = sp[0]; temp = sp[1]; tempnot = sp[2];
-						max = Integer.parseInt(sp[3]);
+						penis = fieldWord.getText();
+                        temp = fieldOrgasm.getText();
+                        tempnot = fieldNotOrgasm.getText();
+						max = Integer.parseInt(spinnerTryCount.getValue().toString());
 						area.setText("");
 						count = 1;
 						while (true) {
@@ -81,9 +117,15 @@ public class TinTin extends JavatterPlugin implements IJavatterTab {
 							area.append(c.toString());
 							if (area.getText().endsWith(penis) || max <= count) break;
 							++count;
-						}
-						scroll.getViewport().scrollRectToVisible(new Rectangle(0, Integer.MAX_VALUE - 1, 1, 1));
+                            try {
+                                sleep(10);
+                            } catch (InterruptedException e1) {
+                                e1.printStackTrace();
+                            }
+                            scrollBar.setValue(scrollBar.getMaximum());
+                        }
 						area.append("\n\n" + limit());
+                        scrollBar.setValue(scrollBar.getMaximum());
 						buttonGo.setEnabled(true);
 					}
 				};
