@@ -127,6 +127,7 @@ public class TinTin extends JavatterPlugin implements IJavatterTab {
 						area.append("\n\n" + limit());
                         scrollBar.setValue(scrollBar.getMaximum());
 						buttonGo.setEnabled(true);
+                        buttonGo.requestFocus();
 					}
 				};
 				thread.start();
