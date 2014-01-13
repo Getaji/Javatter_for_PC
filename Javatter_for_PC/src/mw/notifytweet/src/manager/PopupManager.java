@@ -46,6 +46,10 @@ public enum PopupManager {
         if (visible) {
             popups[index].setLocation(getX(), getY(index));
             try {
+                String text = status.isRetweet() ?
+                        status.getRetweetedStatus().getText():
+                        status.getText();
+                text = text.replace("\n", " ");
                 if (status.isRetweet()) {
                     popups[index].setIconNormal(
                             IconCache.getInstance().getIcon(new URL(
@@ -61,8 +65,7 @@ public enum PopupManager {
                                     .getScreenName() + " / "
                             + status.getRetweetedStatus().getUser().getName()
                             + " :");
-                    popups[index].setTextText(
-                            status.getRetweetedStatus().getText());
+                    popups[index].setTextText(text);
                     popups[index].setPanelBackground(
                             NotifyTweet.getInstance()
                             .getConfigManager().getColorRT());
@@ -75,7 +78,7 @@ public enum PopupManager {
                     popups[index].setTextUser(
                             "@" + status.getUser().getScreenName()
                             + " / " + status.getUser().getName() + " : ");
-                    popups[index].setTextText(status.getText());
+                    popups[index].setTextText(text);
                     popups[index].setPanelBackground(
                             NotifyTweet.getInstance()
                             .getConfigManager().getColorNormal());

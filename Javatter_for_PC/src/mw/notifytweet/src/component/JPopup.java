@@ -132,6 +132,7 @@ public class JPopup extends Window implements ActionListener, MouseListener {
     @Override
     public void setVisible(boolean isVisible) {
         super.setVisible(isVisible);
+        this.setPin(isVisible);
         if (isVisible)
             timer.restart();
         else
