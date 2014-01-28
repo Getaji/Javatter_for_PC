@@ -1,10 +1,10 @@
 package mw.bouyomip.src;
 
-import java.text.SimpleDateFormat;
-
+import com.orekyuu.javatter.controller.UserStreamController;
+import gutil.CustomFormat;
 import twitter4j.Status;
 
-import com.orekyuu.javatter.controller.UserStreamController;
+import java.text.SimpleDateFormat;
 
 /**
  * UserStreamを受信して棒読みちゃんに渡します.
@@ -13,10 +13,21 @@ import com.orekyuu.javatter.controller.UserStreamController;
  */
 public class BouyomiStreamListener extends UserStreamController {
 
-	private BouyomiSaveData save = BouyomiSaveData.INSTANCE;
+	private final BouyomiSaveData save = BouyomiSaveData.INSTANCE;
 	
 	/** 棒読みちゃんコネクター. */
-	private BouyomiChan4J bouyomi = new BouyomiChan4J();
+	private final BouyomiChan4J bouyomi = new BouyomiChan4J();
+
+    private final CustomFormat normalFormat = new CustomFormat();
+
+    private final CustomFormat retweetFotmat = new CustomFormat();
+
+    public BouyomiStreamListener() {
+        retweetFotmat.addPatterns("$rtuser", "$rtname", "$user", "$name",
+                                  "$text", "$rtdate", "$date", "$rtvia", "$via");
+        normalFormat.addPatterns("$user", "$name", "$text", "$date", "$via");
+
+    }
 	
 	@Override
 	public void onStatus(Status status) {
@@ -40,21 +51,23 @@ public class BouyomiStreamListener extends UserStreamController {
 		String res;
 		SimpleDateFormat dateFormat = new SimpleDateFormat(save.getString("format_date"));
 		if (status.isRetweet()) {
-			res = save.getString("format_retweet");
-			res = res.replace("$rtuser", status.getUser().getScreenName()); // $rtuser
-			res = res.replace("$rtname", status.getUser().getName()); // $rtname
-			res = res.replace("$user", status.getRetweetedStatus().getUser().getScreenName()); // $user
-			res = res.replace("$name", status.getRetweetedStatus().getUser().getName()); // $name
-			res = res.replace("$text", status.getRetweetedStatus().getText()); // $text
-			res = res.replace("$date", dateFormat.format(status.getCreatedAt())); // $date
-			res = res.replace("$rtvia", status.getSource().replace("<.+>", ""));
+            retweetFotmat.addObjects(true, status.getUser().getScreenName(),
+                    status.getUser().getName(),
+                    status.getRetweetedStatus().getUser().getScreenName(),
+                    status.getRetweetedStatus().getUser().getName(),
+                    status.getRetweetedStatus().getText(),
+                    dateFormat.format(status.getCreatedAt()),
+                    dateFormat.format(status.getRetweetedStatus().getCreatedAt()),
+                    status.getSource().replace("<.+>", ""),
+                    status.getRetweetedStatus().getSource().replace("<.+>", ""));
+            res = retweetFotmat.format(save.getString("format-retweet"), true);
 		} else {
-			res = save.getString("format_normal");
-			res = res.replace("$user", status.getUser().getScreenName()); // $user
-			res = res.replace("$name", status.getUser().getName()); // $name
-			res = res.replace("$text", status.getText()); // $text
-			res = res.replace("$date", dateFormat.format(status.getCreatedAt())); // $date
-			res = res.replace("$via", status.getSource().replace("<.+>", ""));
+            normalFormat.addObjects(true, status.getUser().getScreenName(),
+                    status.getUser().getName(),
+                    status.getText(),
+                    dateFormat.format(status.getCreatedAt()),
+                    status.getSource().replace("<.+>", ""));
+            res = normalFormat.format(save.getString("format_normal"), true);
 		}
 		
 		return res;
