@@ -2,6 +2,7 @@ package macroloader;
 
 import com.orekyuu.javatter.view.IJavatterTab;
 
+import javax.script.ScriptException;
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
@@ -36,12 +37,15 @@ public class LoadWindowView implements IJavatterTab {
 
     private final JCheckBox checkDynamicLoad;
 
+    private final JCheckBox checkCompile;
+
     public LoadWindowView() {
         listModel = new DefaultListModel<>();
         list = new JList<>(listModel);
         controller = new LoadWindowController(this);
         checkUseConsole = new JCheckBox("Original console");
         checkDynamicLoad = new JCheckBox("Dynamic load");
+        checkCompile = new JCheckBox("Compile");
         init();
     }
 
@@ -69,6 +73,9 @@ public class LoadWindowView implements IJavatterTab {
                                         .addMacro(Parser.getPrefix(file.getName()));
                             } catch (FileNotFoundException e1) {
                                 Macro.instance.err("Macro not found!");
+                            } catch (ScriptException e1) {
+                                Macro.instance.err("Macro \"" + file.getName() +
+                                        "\" is incorrect!");
                             }
                             Macro.instance.exportMacroList();
                         }
@@ -115,6 +122,10 @@ public class LoadWindowView implements IJavatterTab {
         checkUseConsole.addActionListener(controller);
         checkDynamicLoad.addActionListener(controller);
 
+        checkUseConsole.setToolTipText("Output to original console.");
+        checkDynamicLoad.setToolTipText("Reload script when run.");
+        checkCompile.setToolTipText("Compile script when add and reload.");
+
         panelButtons.add(buttonAdd);
         panelButtons.add(Box.createVerticalStrut(5));
         panelButtons.add(buttonRun);
@@ -129,6 +140,7 @@ public class LoadWindowView implements IJavatterTab {
         panelButtons.add(Box.createVerticalStrut(10));
         panelButtons.add(checkUseConsole);
         panelButtons.add(checkDynamicLoad);
+        panelButtons.add(checkCompile);
         panelMain.add(panelButtons, BorderLayout.EAST);
         panelButtons.updateUI();
     }
@@ -168,5 +180,9 @@ public class LoadWindowView implements IJavatterTab {
 
     public boolean isDynamicLoad() {
         return checkDynamicLoad.isSelected();
+    }
+
+    public boolean isCompile() {
+        return checkCompile.isSelected();
     }
 }
