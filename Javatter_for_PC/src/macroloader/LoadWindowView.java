@@ -117,6 +117,8 @@ public class LoadWindowView implements IJavatterTab {
 
         panelButtons.add(buttonAdd);
         panelButtons.add(Box.createVerticalStrut(5));
+        panelButtons.add(buttonRun);
+        panelButtons.add(Box.createVerticalStrut(5));
         panelButtons.add(buttonReload);
         panelButtons.add(Box.createVerticalStrut(5));
         panelButtons.add(buttonRemove);
@@ -124,8 +126,6 @@ public class LoadWindowView implements IJavatterTab {
         panelButtons.add(buttonOpen);
         panelButtons.add(Box.createVerticalStrut(5));
         panelButtons.add(buttonKeyBind);
-        panelButtons.add(Box.createVerticalStrut(10));
-        panelButtons.add(buttonRun);
         panelButtons.add(Box.createVerticalStrut(10));
         panelButtons.add(checkUseConsole);
         panelButtons.add(checkDynamicLoad);

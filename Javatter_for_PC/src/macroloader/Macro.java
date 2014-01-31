@@ -1,5 +1,6 @@
 package macroloader;
 
+import com.orekyuu.javatter.main.Main;
 import com.orekyuu.javatter.plugin.JavatterPlugin;
 import com.orekyuu.javatter.util.ImageManager;
 import com.orekyuu.javatter.view.IJavatterTab;
@@ -35,7 +36,7 @@ public class Macro extends JavatterPlugin {
         instance = this;
         console = new Console();
         macroManager = new MacroManager();
-        macroFile = new File("./macrolist.txt");
+        macroFile = new File("./macrolist.cfg");
         if (!macroFile.exists()) {
             try {
                 macroFile.createNewFile();
@@ -75,6 +76,7 @@ public class Macro extends JavatterPlugin {
                 Macro.instance.err("Macro \"" + file.getAbsolutePath() + "\" not found!");
             }
         }
+        scanner.close();
         try {
             scanner = new Scanner(keyBindFile);
         } catch (FileNotFoundException e) {
@@ -103,7 +105,7 @@ public class Macro extends JavatterPlugin {
                 }
                 if (macroLine < index) {
                     err("[MacroManager] キーバインドのインデックスがマクロファイルの数を超過しています.");
-                    break;
+                    continue;
                 }
                 int keyCode;
                 try {
@@ -125,6 +127,7 @@ public class Macro extends JavatterPlugin {
                 macroManager.addKeyBind(index, new KeyBind(keyCode, modifies, keyChar));
             }
         }
+        scanner.close();
     }
 
     @Override
@@ -206,5 +209,13 @@ public class Macro extends JavatterPlugin {
         getMainView().setStatus(new ImageIcon(
                 ImageManager.getInstance().getImage(ImageManager.STATUS_ERROR)),
                 status);
+    }
+
+    public void getMainWindowView() {
+        Main.getMainView().getTweetTextArea();
+    }
+
+    public void appendTextArea(Object obj) {
+        getMainView().getTweetTextArea().append(obj.toString());
     }
 }

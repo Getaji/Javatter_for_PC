@@ -22,6 +22,10 @@ public class Parser {
     }
 
     public static String keyEventToStr(KeyBind e) {
+        if (e.getKeyCode() == -1) {
+            return "**ALL BIND**";
+        }
+        
         String key;
 
         if (e.getModifiers() == 0) {

@@ -33,6 +33,8 @@ public class MacroManager implements KeyEventDispatcher {
 
     private final Writer systemWriter;
 
+    private KeyEvent lastKeyEvent;
+
     public MacroManager() {
         fileList = new LinkedList<>();
         scriptList = new LinkedList<>();
@@ -79,6 +81,7 @@ public class MacroManager implements KeyEventDispatcher {
     public void remove(int index) {
         fileList.remove(index);
         scriptList.remove(index);
+        keyBindMap.remove(index);
     }
 
     public File getFile(int index) {
@@ -121,10 +124,13 @@ public class MacroManager implements KeyEventDispatcher {
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent e) {
+        lastKeyEvent = e;
         Iterator<List<KeyBind>> iterator = keyBindMap.values().iterator();
         for (int i = 0; iterator.hasNext(); ++i)//List<KeyEvent> list : keyBindMap.values())
-            for (KeyBind reg : iterator.next())
-                if (e.getKeyCode() == reg.getKeyCode() && e.getModifiers() == reg.getModifiers()) {
+            for (KeyBind reg : iterator.next()) {
+                if (reg.getKeyCode() == -1 ||
+                        (e.getKeyCode() == reg.getKeyCode() &&
+                         e.getModifiers() == reg.getModifiers())) {
                     try {
                         run(i);
                     } catch (ScriptException e1) {
@@ -133,6 +139,7 @@ public class MacroManager implements KeyEventDispatcher {
                         e1.printStackTrace();
                     }
                 }
+            }
         return false;
     }
 
@@ -149,5 +156,9 @@ public class MacroManager implements KeyEventDispatcher {
 
     public List<KeyBind> getBindList(int index) {
         return keyBindMap.get(index);
+    }
+
+    public KeyEvent getLastKeyEvent() {
+        return lastKeyEvent;
     }
 }

@@ -103,16 +103,26 @@ public class KeyBindView extends JDialog implements KeyListener, ActionListener 
     public void actionPerformed(ActionEvent e) {
         switch (((JButton) e.getSource()).getText()) {
             case "Bind": {
-                listModel.addElement(field.getText());
-                Macro.instance.getMacroManager().addKeyBind(
-                        index, lastKeyBind);
-                field.setText("");
+                if (field.getText().isEmpty()) {
+                    listModel.addElement("**ALL BIND**");
+                    Macro.instance.getMacroManager().addKeyBind(index, new KeyBind(-1, -1, '*'));
+                } else {
+                    listModel.addElement(field.getText());
+                    Macro.instance.getMacroManager().addKeyBind(
+                            index, lastKeyBind);
+                    field.setText("");
+                }
                 break;
             }
             case "Update": {
                 int select = keyList.getSelectedIndex();
-                listModel.set(select, field.getText());
-                Macro.instance.getMacroManager().setKeyBind(index, select, lastKeyBind);
+                if (field.getText().isEmpty()) {
+                    listModel.addElement("**ALL BIND**");
+                    Macro.instance.getMacroManager().setKeyBind(index, select, new KeyBind(-1, -1, '*'));
+                } else {
+                    listModel.set(select, field.getText());
+                    Macro.instance.getMacroManager().setKeyBind(index, select, lastKeyBind);
+                }
                 break;
             }
             case "Remove": {
@@ -122,5 +132,6 @@ public class KeyBindView extends JDialog implements KeyListener, ActionListener 
                 break;
             }
         }
+        field.requestFocus();
     }
 }
