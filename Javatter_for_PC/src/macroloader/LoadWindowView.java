@@ -23,10 +23,13 @@ public class LoadWindowView implements IJavatterTab {
 
     private final LoadWindowController controller;
 
+    private final JCheckBox useConsole;
+
     public LoadWindowView() {
         listModel = new DefaultListModel<>();
         list = new JList<>(listModel);
         controller = new LoadWindowController(this);
+        useConsole = new JCheckBox("Original console");
     }
 
     @Override
@@ -48,10 +51,16 @@ public class LoadWindowView implements IJavatterTab {
         buttonReload.addActionListener(controller);
         buttonRemove.addActionListener(controller);
         buttonRun.addActionListener(controller);
+        useConsole.addActionListener(controller);
         panelButtons.add(buttonAdd);
+        panelButtons.add(Box.createVerticalStrut(5));
         panelButtons.add(buttonReload);
+        panelButtons.add(Box.createVerticalStrut(5));
         panelButtons.add(buttonRemove);
+        panelButtons.add(Box.createVerticalStrut(10));
         panelButtons.add(buttonRun);
+        panelButtons.add(Box.createVerticalStrut(10));
+        panelButtons.add(useConsole);
         panelMain.add(panelButtons, BorderLayout.EAST);
 
         return panelMain;
@@ -75,5 +84,9 @@ public class LoadWindowView implements IJavatterTab {
 
     public void removeElement(int index) {
         listModel.remove(index);
+    }
+
+    public boolean isUseConsole() {
+        return useConsole.isSelected();
     }
 }

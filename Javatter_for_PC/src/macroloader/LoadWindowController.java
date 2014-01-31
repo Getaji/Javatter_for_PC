@@ -79,6 +79,8 @@ public class LoadWindowController implements ActionListener {
                     break;
                 }
             }
+        } else if (component instanceof JCheckBox) {
+            Macro.instance.getMacroManager().setUseConsole(view.isUseConsole());
         }
     }
 

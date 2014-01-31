@@ -18,7 +18,7 @@ public class Macro extends JavatterPlugin {
 
     public static Macro instance;
 
-    private final LoadWindowView view;
+    private LoadWindowView view;
 
     private final MacroManager macroManager;
 
@@ -28,7 +28,6 @@ public class Macro extends JavatterPlugin {
 
     public Macro() {
         instance = this;
-        view = new LoadWindowView();
         console = new Console();
         macroManager = new MacroManager();
         export = new File("./macrolist.txt");
@@ -74,7 +73,10 @@ public class Macro extends JavatterPlugin {
 
     @Override
     public IJavatterTab getPluginConfigViewObserver() {
-        return new LoadWindowView();
+        if (view == null) {
+            view = new LoadWindowView();
+        }
+        return view;
     }
 
     public void exportMacroList() {

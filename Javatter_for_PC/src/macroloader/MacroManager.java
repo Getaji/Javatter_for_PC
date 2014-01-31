@@ -5,6 +5,7 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.Writer;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
@@ -24,11 +25,16 @@ public class MacroManager {
 
     private final StringBuilder builder;
 
+    private final Writer consoleWriter;
+
+    private final Writer systemWriter;
+
     public MacroManager() {
         fileList = new LinkedList<>();
         scriptList = new LinkedList<>();
         engine = new ScriptEngineManager().getEngineByName("JavaScript");
-        engine.getContext().setWriter(Macro.instance.getConsole().getWriter());
+        consoleWriter = Macro.instance.getConsole().getWriter();
+        systemWriter = engine.getContext().getWriter();
         builder = new StringBuilder();
     }
 
@@ -68,5 +74,9 @@ public class MacroManager {
 
     public List<File> getFileList() {
         return fileList;
+    }
+
+    public void setUseConsole(boolean useConsole) {
+        engine.getContext().setWriter(useConsole ? consoleWriter : systemWriter);
     }
 }

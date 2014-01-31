@@ -23,7 +23,7 @@ public class Console extends JFrame {
         area.setBorder(new EmptyBorder(7, 7, 7, 7));
         area.setBackground(Color.BLACK);
         area.setForeground(Color.WHITE);
-        area.setFont(new Font("MS PGothic", Font.PLAIN, 12));
+        area.setEditable(false);
         add(area);
         setSize(640, 480);
 
