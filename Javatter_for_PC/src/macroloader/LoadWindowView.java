@@ -7,6 +7,15 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import java.awt.*;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetDropEvent;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 /**
  * javadoc here.
@@ -23,22 +32,61 @@ public class LoadWindowView implements IJavatterTab {
 
     private final LoadWindowController controller;
 
-    private final JCheckBox useConsole;
+    private final JCheckBox checkUseConsole;
+
+    private final JCheckBox checkDynamicLoad;
 
     public LoadWindowView() {
         listModel = new DefaultListModel<>();
         list = new JList<>(listModel);
         controller = new LoadWindowController(this);
-        useConsole = new JCheckBox("Original console");
+        checkUseConsole = new JCheckBox("Original console");
+        checkDynamicLoad = new JCheckBox("Dynamic load");
     }
 
     @Override
     public Component getComponent() {
         panelMain.setLayout(new BorderLayout());
 
+        list.setDropTarget(new DropTarget() {
+            @Override public void drop(DropTargetDropEvent e) {
+                try {
+                    Transferable transfer = e.getTransferable();
+                    // ファイルリストの転送を受け付ける
+                    if (transfer.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+                        // copyとmoveを受け付ける
+                        e.acceptDrop(DnDConstants.ACTION_COPY_OR_MOVE);
+                        // ドラッグ＆ドロップされたファイルのリストを取得
+                        java.util.List<File> fileList =
+                                (java.util.List<File>) transfer.getTransferData(
+                                        DataFlavor.javaFileListFlavor);
+                        // 取得したファイルの名称を表示
+                        for (File file : fileList) {
+                            try {
+                                MacroManager macroManager = Macro.instance.getMacroManager();
+                                macroManager.add(file, macroManager.load(file));
+                                Macro.instance.getLoadWindowView()
+                                        .addMacro(Parser.getPrefix(file.getName()));
+                            } catch (FileNotFoundException e1) {
+                                Macro.instance.err("Macro not found!");
+                            }
+                            Macro.instance.exportMacroList();
+                        }
+                    }
+                } catch (UnsupportedFlavorException e1) {
+                    e1.printStackTrace();
+                } catch (IOException e2) {
+                    e2.printStackTrace();
+                }
+            }
+        });
         list.setBorder(new CompoundBorder(new EmptyBorder(7, 7, 7, 7),
                                           new LineBorder(Color.GRAY)));
-        panelMain.add(list, BorderLayout.CENTER);
+        JScrollPane scrollPane = new JScrollPane(
+                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setViewportView(list);
+        panelMain.add(scrollPane, BorderLayout.CENTER);
 
         JPanel panelButtons = new JPanel();
         panelButtons.setBorder(new EmptyBorder(7, 7, 7, 7));
@@ -46,22 +94,43 @@ public class LoadWindowView implements IJavatterTab {
         JButton buttonAdd = new JButton("Add");
         JButton buttonReload = new JButton("Reload");
         JButton buttonRemove = new JButton("Remove");
+        JButton buttonOpen = new JButton("Folder");
+        JButton buttonKeyBind = new JButton("KeyBind");
         JButton buttonRun = new JButton("Run");
+
         buttonAdd.addActionListener(controller);
         buttonReload.addActionListener(controller);
         buttonRemove.addActionListener(controller);
+        buttonOpen.addActionListener(controller);
+        buttonKeyBind.addActionListener(controller);
         buttonRun.addActionListener(controller);
-        useConsole.addActionListener(controller);
+
+        buttonAdd.setToolTipText("Load and add Javascript file.");
+        buttonReload.setToolTipText("Reload script.");
+        buttonRemove.setToolTipText("Remove script.");
+        buttonOpen.setToolTipText("Open script folder.");
+        buttonKeyBind.setToolTipText("Setting key binding.");
+        buttonRun.setToolTipText("Run script.");
+
+        checkUseConsole.addActionListener(controller);
+        checkDynamicLoad.addActionListener(controller);
+
         panelButtons.add(buttonAdd);
         panelButtons.add(Box.createVerticalStrut(5));
         panelButtons.add(buttonReload);
         panelButtons.add(Box.createVerticalStrut(5));
         panelButtons.add(buttonRemove);
+        panelButtons.add(Box.createVerticalStrut(5));
+        panelButtons.add(buttonOpen);
+        panelButtons.add(Box.createVerticalStrut(5));
+        panelButtons.add(buttonKeyBind);
         panelButtons.add(Box.createVerticalStrut(10));
         panelButtons.add(buttonRun);
         panelButtons.add(Box.createVerticalStrut(10));
-        panelButtons.add(useConsole);
+        panelButtons.add(checkUseConsole);
+        panelButtons.add(checkDynamicLoad);
         panelMain.add(panelButtons, BorderLayout.EAST);
+        panelButtons.updateUI();
 
         return panelMain;
     }
@@ -72,6 +141,10 @@ public class LoadWindowView implements IJavatterTab {
 
     public void addMacro(String name) {
         listModel.addElement(name);
+    }
+
+    public int getSelectedIndex() {
+        return list.getSelectedIndex();
     }
 
     public int[] getSelectedIndices() {
@@ -87,6 +160,10 @@ public class LoadWindowView implements IJavatterTab {
     }
 
     public boolean isUseConsole() {
-        return useConsole.isSelected();
+        return checkUseConsole.isSelected();
+    }
+
+    public boolean isDynamicLoad() {
+        return checkDynamicLoad.isSelected();
     }
 }

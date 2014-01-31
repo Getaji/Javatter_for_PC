@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 /**
  * javadoc here.
@@ -67,6 +68,21 @@ public class LoadWindowController implements ActionListener {
                     Macro.instance.exportMacroList();
                     break;
                 }
+                case "Folder": {
+                    for (int index : view.getSelectedIndices()) {
+                        File file = Macro.instance.getMacroManager().getFile(index).getParentFile();
+                        try {
+                            Desktop.getDesktop().open(file);
+                        } catch (IOException e1) {
+                            e1.printStackTrace();
+                        }
+                    }
+                    break;
+                }
+                case "KeyBind": {
+                    new KeyBindView(view.getSelectedIndex()).setVisible(true);
+                    break;
+                }
                 case "Run": {
                     for (int index : view.getSelectedIndices()) {
                         try {
@@ -74,13 +90,24 @@ public class LoadWindowController implements ActionListener {
                         } catch (ScriptException e1) {
                             Macro.instance.err("Macro \"" + view.getElement(index) +
                                     "\" is incorrect!");
+                        } catch (FileNotFoundException e1) {
+                            Macro.instance.err("Macro \"" + view.getElement(index) +
+                                    "\" not found!");
                         }
                     }
                     break;
                 }
             }
         } else if (component instanceof JCheckBox) {
-            Macro.instance.getMacroManager().setUseConsole(view.isUseConsole());
+            switch (((JCheckBox) component).getText()) {
+                case "Original console": {
+                    Macro.instance.getMacroManager().setUseConsole(view.isUseConsole());
+                    break;
+                }
+                case "Dynamic load": {
+                    break;
+                }
+            }
         }
     }
 
