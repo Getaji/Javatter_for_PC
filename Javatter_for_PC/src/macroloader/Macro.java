@@ -88,9 +88,6 @@ public class Macro extends JavatterPlugin {
             if (str.isEmpty()) {
                 continue;
             }
-            if (macroLine < keyBindLine) {
-                err("[MacroManager] キーバインドのインデックスがマクロファイルの数を超過しています.");
-            }
             String[] values = str.split("\\|\\|");
             if (values.length < 4) {
                 err("[MacroLoader] macro_keybind.cfg キーバインドの値が足りません.:" +
@@ -103,6 +100,10 @@ public class Macro extends JavatterPlugin {
                     err("[MacroLoader] macro_keybind.cfg インデックス値が不正です.:" +
                             keyBindLine + "行目\n");
                     continue;
+                }
+                if (macroLine < index) {
+                    err("[MacroManager] キーバインドのインデックスがマクロファイルの数を超過しています.");
+                    break;
                 }
                 int keyCode;
                 try {

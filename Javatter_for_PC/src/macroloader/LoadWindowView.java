@@ -42,10 +42,10 @@ public class LoadWindowView implements IJavatterTab {
         controller = new LoadWindowController(this);
         checkUseConsole = new JCheckBox("Original console");
         checkDynamicLoad = new JCheckBox("Dynamic load");
+        init();
     }
 
-    @Override
-    public Component getComponent() {
+    public void init() {
         panelMain.setLayout(new BorderLayout());
 
         list.setDropTarget(new DropTarget() {
@@ -80,12 +80,12 @@ public class LoadWindowView implements IJavatterTab {
                 }
             }
         });
-        list.setBorder(new CompoundBorder(new EmptyBorder(7, 7, 7, 7),
-                                          new LineBorder(Color.GRAY)));
         JScrollPane scrollPane = new JScrollPane(
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setViewportView(list);
+        scrollPane.setBorder(new CompoundBorder(new EmptyBorder(7, 7, 7, 7),
+                new LineBorder(Color.GRAY)));
         panelMain.add(scrollPane, BorderLayout.CENTER);
 
         JPanel panelButtons = new JPanel();
@@ -131,7 +131,10 @@ public class LoadWindowView implements IJavatterTab {
         panelButtons.add(checkDynamicLoad);
         panelMain.add(panelButtons, BorderLayout.EAST);
         panelButtons.updateUI();
+    }
 
+    @Override
+    public Component getComponent() {
         return panelMain;
     }
 
